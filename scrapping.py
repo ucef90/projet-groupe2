@@ -6,6 +6,5 @@ import requests
 url = "https://www.paroles.net/"
 
 r = requests.get(url)
-print(dir(r))
-soup = BeautifulSoup(r)
-print(soup)
+soup = BeautifulSoup(r.text, "html.parser")
+
