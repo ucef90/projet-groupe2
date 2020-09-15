@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 #
 import time
+import csv 
 
 #Fonction qui permet de récuperer les paroles d'une chanson à partir de son url sur le site paroles.net
 def get_paroles(lien):
@@ -17,7 +18,7 @@ def get_paroles(lien):
 
     
 #Liste des chanteurs dont on souhaite récupérer les chansons : à completer
-liste_artistes=['kery-james',	'Rim-K',	'damso',	'youssoupha',	'Soprano',	'Orelsan',	'dosseh',	'Scylla',	'booba',	'Rohff',	'Kaaris',	'nick-conrad',	'NTM',	'Doc-Gyneco',	'Lunatic',	'VII',	'ninho',	'nekfeu',	'georgio',	'vald',	'sultan',	'kaaris',	'bigflo-oli',	'hayce-lemsi',	'pnl',	'lacrim',	'mister-you',	'jul',	'sch',	'guizmo',	'sexion-d-assaut',	'ntm',	'oxmo-puccino',	'iam',	'sniper',	'sinik',	'mac-tyer',	'sefyu']
+liste_artistes=[]
 
 #Liste qui contiendra les données scrappées. Un élément de la liste sera ainsi : {'chanteur':'nomChanteur', 'titre':'titreChanson', 'lien':'lienChanson', 'paroles':'parolesChanson}
 liste_finale = []
@@ -29,19 +30,18 @@ for el in liste_artistes:
     url = "https://www.paroles.net/" + el
     #sur paroles.net, la liste des chansons pour un artiste est paginée. On récupère le nombre de page par artiste dans la variable nb.
     t1=requests.get(url+"-1000")
-    time.sleep(5)
+    time.sleep(20)
     t2 = t1.url[-1]
     if t2 in chiffres:
         nb = int(t1.url[-1])
-        time.sleep(5)
     else:
         nb = 1
-    print("chanteur : {}, nombre de pages :{}".format(el,nb))
     #Une fois
     for n in range(1,nb+1):
         try:
             url2=url + "-" + str(n)
             req = Request(url2, headers={'User-agent':'Opera/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'})
+            time.sleep(90)
             response = urlopen(req).read()
             soup=BeautifulSoup(response,"html.parser")
             liste_chansons=soup.findAll("a", {"itemprop": "url"})
@@ -51,9 +51,14 @@ for el in liste_artistes:
                 dico['titre'] = chanson.text
                 dico['lien'] = chanson['href']
                 dico['paroles'] = get_paroles(dico['lien'])
-                time.sleep(5)
+                time.sleep(90)
                 liste_finale.append(dico)
-                print("{} page {}".format(el, n))
         except Exception as e:
-            print("{} page {}".format(el, n))
-            print(e)
+            pass
+
+
+keys = liste_finale[0].keys()
+with open('chansons1.csv', 'w', newline='')  as output_file:
+    dict_writer = csv.DictWriter(output_file, keys)
+    dict_writer.writeheader()
+    dict_writer.writerows(liste_finale)
