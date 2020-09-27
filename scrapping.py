@@ -14,8 +14,10 @@ def get_paroles(lien):
     response = urlopen(req).read()
     soup=BeautifulSoup(response,"html.parser")
     br=soup.findAll("br")
-    return " ".join([b.next for b in br if b.next!="\n"]).replace("\n","")
-
+    if (br):
+        return " ".join([b.next for b in br if b.next!="\n"]).replace("\n","")
+    else: 
+        return "rien a scraper"
     
 #Liste des chanteurs dont on souhaite récupérer les chansons : à completer
 liste_artistes=[]
